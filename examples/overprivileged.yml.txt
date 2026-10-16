@@ -1,0 +1,10 @@
+# INACTIVE TEACHING EXAMPLE. This file is intentionally not in .github/workflows.
+name: Before hardening
+on: [workflow_dispatch]
+permissions: write-all
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6 # mutable tag, intentionally shown for comparison
+      - run: echo "Broad workflow token, no protected environment, no deploy separation"

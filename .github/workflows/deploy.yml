@@ -1,0 +1,35 @@
+name: Deploy one sandbox artifact
+on:
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: conference-sandbox
+  cancel-in-progress: false
+jobs:
+  deploy:
+    if: github.ref == 'refs/heads/main'
+    environment: conference-sandbox
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    permissions:
+      contents: read
+      id-token: write
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803
+        with:
+          persist-credentials: false
+      - name: Check sandbox configuration
+        env:
+          ROLE: ${{ vars.AWS_ROLE_ARN }}
+          BUCKET: ${{ vars.ARTIFACT_BUCKET }}
+        run: test -n "$ROLE" && test -n "$BUCKET"
+      - uses: aws-actions/configure-aws-credentials@e3dd6a429d7300a6a4c196c26e071d42e0343502
+        with:
+          role-to-assume: ${{ vars.AWS_ROLE_ARN }}
+          aws-region: ${{ vars.AWS_REGION }}
+          allowed-account-ids: ${{ vars.AWS_ACCOUNT_ID }}
+      - name: Upload intended artifact; prove another prefix is denied
+        env:
+          ARTIFACT_BUCKET: ${{ vars.ARTIFACT_BUCKET }}
+        run: python scripts/verify_deploy.py

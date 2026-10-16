@@ -1,0 +1,106 @@
+{
+  "AWSTemplateFormatVersion": "2010-09-09",
+  "Description": "360TrustLab CRH04 bounded artifact deployment sandbox",
+  "Parameters": {
+    "GitHubOidcProviderArn": {
+      "Type": "String"
+    },
+    "ExactGitHubSubject": {
+      "Type": "String",
+      "AllowedPattern": "repo:360TrustLab(@[0-9]+)?/pipeline-hardening(@[0-9]+)?:environment:conference-sandbox"
+    }
+  },
+  "Resources": {
+    "Artifacts": {
+      "Type": "AWS::S3::Bucket",
+      "Properties": {
+        "PublicAccessBlockConfiguration": {
+          "BlockPublicAcls": true,
+          "BlockPublicPolicy": true,
+          "IgnorePublicAcls": true,
+          "RestrictPublicBuckets": true
+        },
+        "BucketEncryption": {
+          "ServerSideEncryptionConfiguration": [
+            {
+              "ServerSideEncryptionByDefault": {
+                "SSEAlgorithm": "AES256"
+              }
+            }
+          ]
+        },
+        "LifecycleConfiguration": {
+          "Rules": [
+            {
+              "Id": "ExpireDemoArtifacts",
+              "Status": "Enabled",
+              "ExpirationInDays": 1
+            }
+          ]
+        }
+      }
+    },
+    "DeployRole": {
+      "Type": "AWS::IAM::Role",
+      "Properties": {
+        "MaxSessionDuration": 3600,
+        "AssumeRolePolicyDocument": {
+          "Version": "2012-10-17",
+          "Statement": [
+            {
+              "Effect": "Allow",
+              "Principal": {
+                "Federated": {
+                  "Ref": "GitHubOidcProviderArn"
+                }
+              },
+              "Action": "sts:AssumeRoleWithWebIdentity",
+              "Condition": {
+                "StringEquals": {
+                  "token.actions.githubusercontent.com:aud": "sts.amazonaws.com",
+                  "token.actions.githubusercontent.com:sub": {
+                    "Ref": "ExactGitHubSubject"
+                  }
+                }
+              }
+            }
+          ]
+        },
+        "Policies": [
+          {
+            "PolicyName": "OneReleasePrefix",
+            "PolicyDocument": {
+              "Version": "2012-10-17",
+              "Statement": [
+                {
+                  "Effect": "Allow",
+                  "Action": [
+                    "s3:PutObject"
+                  ],
+                  "Resource": {
+                    "Fn::Sub": "${Artifacts.Arn}/releases/*"
+                  }
+                }
+              ]
+            }
+          }
+        ]
+      }
+    }
+  },
+  "Outputs": {
+    "ArtifactBucket": {
+      "Value": {
+        "Ref": "Artifacts"
+      }
+    },
+    "DeployRoleArn": {
+      "Value": {
+        "Fn::GetAtt": [
+          "DeployRole",
+          "Arn"
+        ]
+      }
+    }
+  }
+}
