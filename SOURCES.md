@@ -8,3 +8,8 @@
 The local check compares issuer, audience, and subject strings. It does not
 validate a JWT signature or call STS. The AWS deployment and probe are separate
 steps documented in the README.
+
+The OIDC slide uses the stack's `ExactGitHubSubject` reference rather than a
+made-up concrete subject. See the linked GitHub OIDC reference for immutable
+numeric IDs. The local model's `SYNTHETIC` labels are intentionally placeholders
+and must not be used as deployment subjects.
