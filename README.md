@@ -22,6 +22,30 @@ how an exact protected-environment subject excludes a branch and sibling repo.
 The claims use visibly synthetic IDs. This is not authentication, an IAM simulator,
 a successful STS exchange, or proof of AWS enforcement.
 
+## OIDC example and deployment configuration
+
+The slide now shows the actual stack condition as CloudFormation YAML:
+
+```yaml
+StringEquals:
+  token.actions.githubusercontent.com:aud: sts.amazonaws.com
+  token.actions.githubusercontent.com:sub: !Ref ExactGitHubSubject
+```
+
+The checked-in template is JSON; the slide uses equivalent YAML notation.
+`ExactGitHubSubject` must be the subject actually issued for this repository's
+`conference-sandbox` environment. The workflow names that environment, and the
+stack parameter constrains the repository and environment. Configure allowed
+branches separately in GitHub environment settings.
+
+The local model deliberately uses `SYNTHETIC-ORG-ID` and `SYNTHETIC-REPO-ID`
+placeholders. Those are string-comparison fixtures, not valid numeric GitHub
+IDs, observed token claims, or deployment values. Do not copy them into AWS.
+GitHub documents an immutable subject format containing numeric owner and
+repository IDs for newer repositories. Verify the issued subject and any
+customization before supplying the parameter. No AWS token exchange has been
+validated for this package.
+
 ## Demo 1: inspect the trust chain (10–12 minutes)
 
 1. Open `examples/overprivileged.yml.txt`. Compare its workflow scope and mutable action tag.
@@ -29,7 +53,18 @@ a successful STS exchange, or proof of AWS enforcement.
 3. Compare local before/after subject decisions with `python3 lab.py`.
 4. Open `infra/stack.json`: OIDC audience and exact subject, then one S3 prefix.
 
-## Demo 2: harden and retest (10–12 minutes)
+## Demo 2: harden and retest locally (10–12 minutes)
+
+Run `python3 lab.py`, compare the before/after subject decisions, and review the
+scoped workflow and role policy. Use the included local captures as fallback.
+This demonstrates the condition model; it does not verify AWS authorization.
+
+### Optional AWS sandbox extension (not yet validated)
+
+The CloudFormation template, deployment workflow, and AWS probe have not been
+deployed or validated in a real account. The following are intended validation
+steps, not results already established by this package. Run them successfully
+in a dedicated sandbox before presenting them as live AWS evidence.
 
 1. Configure the AWS sandbox as described below.
 2. Run **Deploy one sandbox artifact** on `main`.
@@ -37,7 +72,7 @@ a successful STS exchange, or proof of AWS enforcement.
 4. Review the run logs and the role policy. The local negative subject test is a
    condition illustration, not a real failed STS request from another repository.
 
-## AWS setup (not automatic)
+## Optional AWS sandbox setup (not yet validated)
 
 Use a dedicated sandbox. Existing GitHub OIDC provider must be supplied explicitly.
 Inspect the real subject of this repository: new repositories can include immutable
