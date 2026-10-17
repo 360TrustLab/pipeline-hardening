@@ -1,12 +1,10 @@
 # Technical references
 
-Reviewed for the conference lab on October 15, 2026.
+- [GitHub OIDC subject claims](https://docs.github.com/en/actions/reference/security/oidc)
+- [GitHub OIDC with AWS](https://docs.github.com/en/actions/how-tos/secure-your-work/security-harden-deployments/oidc-in-aws)
+- [GitHub Actions security](https://docs.github.com/en/actions/reference/security/secure-use)
+- [AWS role trust for OIDC](https://docs.aws.amazon.com/IAM/latest/UserGuide/id_roles_create_for-idp_oidc.html)
 
-- GitHub OIDC and immutable subject claims: https://docs.github.com/en/actions/reference/security/oidc
-- GitHub OIDC with AWS: https://docs.github.com/en/actions/how-tos/secure-your-work/security-harden-deployments/oidc-in-aws
-- AWS policy evaluation: https://docs.aws.amazon.com/IAM/latest/UserGuide/reference_policies_evaluation-logic.html
-- CloudFormation: https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/Welcome.html
-
-Local models are deliberately limited teaching aids. They do not validate JWT
-signatures, implement the full IAM evaluation algorithm, or produce CloudTrail
-events. Only an actual AWS run can establish the corresponding AWS results.
+The local check compares issuer, audience and subject strings. It does not
+validate a JWT signature or call STS. The AWS deployment and probe are separate
+steps documented in the README.
