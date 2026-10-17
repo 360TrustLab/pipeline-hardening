@@ -1,5 +1,13 @@
 # CRH04: Hardening CI/CD Pipelines
 
+I use this lab to examine the authority of a release, then ask what a team can
+narrow without breaking legitimate deployment. The operating questions matter:
+who maintains the role, who reviews a change, and who can recover the release?
+
+See [Operating decisions](OPERATING_DECISIONS.md) for rollout, ownership, and
+recovery questions. The runnable checks and the AWS validation path remain
+separate.
+
 Conference demos for Guillermo A. Fisher, Live! 360 Orlando 2026.
 
 ## Run locally (no installation or AWS required)

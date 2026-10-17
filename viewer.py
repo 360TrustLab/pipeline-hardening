@@ -5,7 +5,7 @@ from pathlib import Path
 from urllib.parse import urlparse,parse_qs
 import lab
 ROOT=Path(__file__).parent
-VIEWS={'before': 'Inspect the trust chain', 'after': 'Harden the subject and retest'}
+VIEWS={'before': 'What can this release change?', 'after': 'The release works with narrower access'}
 
 def report(view):
     return lab.evaluate()
